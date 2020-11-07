@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}POST{% endblock title %}
+
+{% block content %}
+
+    <div class="ui grid">
+        <div class="row">
+            <div class="eleven wide column">
+               {% for qs in queryset %}
+                    <div class="ui fluid card">
+                        <div class="content">
+                            {{ qs.content }}
+                        </div>
+                        <div class="content">
+                            <form action="{% url 'posts:like_unlike_post' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value={{ qs.id }}>
+                                <button type="submit" class="ui primary button">
+                                    {% if profile not in qs.liked.all %}
+                                        <i class="thumbs up icon"></i>&nbsp;Like
+                                    {% else %}
+                                        <i class="thumbs down icon"></i>&nbsp;Unlike
+                                    {% endif %}
+                                </button>
+                                &nbsp;{{ qs.num_likes }}
+                            </form>
+                        </div>
+                    </div>
+               {% endfor %}
+            </div>
+            <div class="five wide column">
+                FORM
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock content %}
+
+
