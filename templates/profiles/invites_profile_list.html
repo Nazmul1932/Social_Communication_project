@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}My Invitations Profiles{% endblock title %}
+
+{% block content %}
+    <ul>
+        {% for obj in qs %}
+            <li>{{ obj }}</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}
