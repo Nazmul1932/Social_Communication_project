@@ -1,107 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}POST{% endblock title %}
 
-{#{% block content %}#}
-{##}
-{#    <div class="ui grid">#}
-{#        <div class="row">#}
-{#            <div class="eleven wide column">#}
-{#               {% for qs in queryset %}#}
-{#                    <div class="ui fluid card">#}
-{#                        <div class="content">#}
-{#                            {{ qs.content }}#}
-{#                        </div>#}
-{#                        <div class="content">#}
-{#                            <form action="{% url 'posts:like_unlike_post' %}" method="post">#}
-{#                                {% csrf_token %}#}
-{#                                <input type="hidden" name="post_id" value={{ qs.id }}>#}
-{#                                <button type="submit" class="ui inverted green button">#}
-{#                                    {% if profile not in qs.liked.all %}#}
-{#                                        <i class="thumbs up icon"></i>&nbsp;Like#}
-{#                                    {% else %}#}
-{#                                        <i class="thumbs down icon"></i>&nbsp;Unlike#}
-{#                                    {% endif %}#}
-{#                                </button>#}
-{#                                &nbsp;{{ qs.num_likes }}#}
-{#                            </form>#}
-{#                        </div>#}
-{##}
-{#                        <div>#}
-{#                            {% if qs.comment_set.all %}#}
-{#                                {% for comment in qs.comment_set.all %}#}
-{#                                    <p>{{ comment.body }}</p>#}
-{#                                {% endfor %}#}
-{#                            {% endif %}#}
-{#                        </div>#}
-{##}
-{#                        <form action="" method="post" class="ui form">#}
-{#                            {% csrf_token %}#}
-{#                            <input type="hidden" name="post_id" value={{ qs.id }}>#}
-{#                            {{ comment_form }}#}
-{#                            <button type="submit" class="ui inverted violet button" name="submit_comment_form">#}
-{#                                Comment#}
-{#                            </button>#}
-{#                        </form>#}
-{#                    </div>#}
-{#               {% endfor %}#}
-{#            </div>#}
-{#            <div class="five wide column">#}
-{#                {% if post_added %}#}
-{#                    <div class="ui green message">Post Added</div>#}
-{#                {% endif %}#}
-{#                <form action="" method="post" enctype="multipart/form-data" class="ui form">#}
-{#                    {% csrf_token %}#}
-{#                        {{ post_form }}#}
-{#                    <button type="submit" class="ui inverted blue button" name="submit_post_form">#}
-{#                        Post#}
-{#                    </button>#}
-{#                </form>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{##}
-
-{# $('.like-form').submit(function(e){#}
-{#                e.preventDefault()#}
-{##}
-{#                const post_id = $(this).attr('id')#}
-{##}
-{#                const likeText = $(`.like-btn${post_id}`).text()#}
-{#                const trim = $.trim(likeText)#}
-{##}
-{#                const url = $(this).attr('action')#}
-{##}
-{#                let res;#}
-{#                const likes = $(`.like-count${post_id}`).text()#}
-{#                const trimCount = parseInt(likes)#}
-{##}
-{#                $.ajax({#}
-{#                    type: 'POST',#}
-{#                    url: url,#}
-{#                    data: {#}
-{#                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),#}
-{#                        'post_id':post_id,#}
-{#                    },#}
-{#                    success: function(response) {#}
-{#                        if(trim === 'Unlike') {#}
-{#                            $(`.like-btn${post_id}`).text('Like')#}
-{#                            res = trimCount - 1#}
-{#                        } else {#}
-{#                            $(`.like-btn${post_id}`).text('Unlike')#}
-{#                            res = trimCount + 1#}
-{#                        }#}
-{##}
-{#                        $(`.like-count${post_id}`).text(res)#}
-{#                    },#}
-{#                    error: function(response) {#}
-{#                        console.log('error', response)#}
-{#                    }#}
-{#                })#}
-{##}
-{#            })#}
-
-{##}
-{#{% endblock content %}#}
 {% block content %}
 <div class="ui grid">
     <div class="eleven wide column">
@@ -210,6 +109,44 @@
                     display=false
                 }
             });
+             $('.like-form').submit(function(e){
+                e.preventDefault()
+
+                const post_id = $(this).attr('id')
+
+                const likeText = $(`.like-btn${post_id}`).text()
+                const trim = $.trim(likeText)
+
+                const url = $(this).attr('action')
+
+                let res;
+                const likes = $(`.like-count${post_id}`).text()
+                const trimCount = parseInt(likes)
+
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val(),
+                        'post_id':post_id,
+                    },
+                    success: function(response) {
+                        if(trim === 'Unlike') {
+                            $(`.like-btn${post_id}`).text('Like')
+                            res = trimCount - 1
+                        } else {
+                            $(`.like-btn${post_id}`).text('Unlike')
+                            res = trimCount + 1
+                        }
+
+                        $(`.like-count${post_id}`).text(res)
+                    },
+                    error: function(response) {
+                        console.log('error', response)
+                    }
+                })
+
+            })
         });
     </script>
 {% endblock scripts %}

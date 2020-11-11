@@ -1,7 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from .forms import ProfileModelForm
-from django.views.generic import ListView
+from django.views.generic import ListView,DetailView
 from django.contrib.auth.models import User
 
 
@@ -24,10 +24,37 @@ def my_profile_view(request):
 def invites_received(request):
     profile = Profile.objects.get(user=request.user)
     queryset = Relationship.objects.invitations_received(profile)
+    results = list(map(lambda x: x.sender, queryset))
+    is_empty = False
+    if len(results) == 0:
+        is_empty = True
     context = {
-        'queryset': queryset,
+        'queryset': results,
+        'is_empty': is_empty,
     }
     return render(request, 'profiles/invite_received.html', context)
+
+
+def accept_invitation(request):
+    if request.method=="POST":
+        pk = request.POST.get('profile_pk')
+        sender = Profile.objects.get(pk=pk)
+        receiver = Profile.objects.get(user=request.user)
+        rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
+        if rel.status == 'send':
+            rel.status = 'accepted'
+            rel.save()
+    return redirect('profiles:invites_received_view')
+
+
+def reject_invitation(request):
+    if request.method == "POST":
+        pk = request.POST.get('profile_pk')
+        receiver = Profile.objects.get(user=request.user)
+        sender = Profile.objects.get(pk=pk)
+        rel = get_object_or_404(Relationship, sender=sender, receiver=receiver)
+        rel.delete()
+    return redirect('profiles:invites_received_view')
 
 
 def invites_profiles_list(request):
@@ -46,6 +73,32 @@ def profiles_list(request):
         'qs':qs,
     }
     return render(request, 'profiles/profile_list.html', context)
+
+
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = 'profiles/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = User.objects.get(username__iexact=self.request.user)
+        profile = Profile.objects.get(user=user)
+        relationship_receive = Relationship.objects.filter(sender=profile)
+        relationship_send = Relationship.objects.filter(receiver=profile)
+        relationship_receiver = []
+        relationship_sender = []
+
+        for item in relationship_receive:
+            relationship_receiver.append(item.receiver.user)
+        for item in relationship_send:
+            relationship_sender.append(item.sender.user)
+
+        context['relationship_receiver'] = relationship_receiver
+        context['relationship_sender'] = relationship_sender
+        context['posts'] = self.get_object().get_all_authors_post()
+        context['len_posts'] = True if len(self.get_object().get_all_authors_post()) > 0 else False
+        return context
+
 
 
 class ProfileListView(ListView):

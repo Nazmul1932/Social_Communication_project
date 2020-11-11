@@ -10,4 +10,7 @@ urlpatterns = [
     path('invites_profiles_list/', invites_profiles_list, name='invites_profiles_list'),
     path('send_invitation/', send_invitation, name='send_invitation'),
     path('remove_from_friends/', remove_from_friends, name='remove_from_friends'),
+    path('invites_received_view/accept/', accept_invitation, name='accept_invite'),
+    path('invites_received_view/reject/', reject_invitation, name='reject_invite'),
+    path('<slug>/', ProfileDetailView.as_view(), name='profile-detail-view'),
 ]
